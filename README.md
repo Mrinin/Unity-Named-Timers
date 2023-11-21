@@ -79,14 +79,14 @@ Code Example:
     
             if (Input.GetKeyDown(KeyCode.S))
             {
-                // If you press, S, it wall call ILoveYou in 2 seconds. But because it will always try to call with the same name,
+                // If you press, S, it wall call the print statement in 2 seconds. But because it will always try to call with the same name,
                 // Pressing S again before the 2 seconds are up will reset the timer. Sometimes, this is the intended behaviour.
                 th.SetTimer("PrintCooldown", 2, () => print("Please do not spam S :( "));
             }
     
             if (Input.GetKeyDown(KeyCode.D))
             {
-                // Nameless timers, will always call ILoveYou after 3 seconds. Because the timer has no name, the button can be spammed
+                // Nameless timers, will always call the print statement after 3 seconds. Because the timer has no name, the D key can be spammed
                 th.AddNamelessTimer(3, () => print("I am unnamed, and thus prone to being spammed"));
             }
     
