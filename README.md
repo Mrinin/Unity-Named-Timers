@@ -28,6 +28,8 @@ AddTimer: Creates a new named timer with more parameters. If a timer with that n
 
 AddNamelessTimer: Creates a new timer that has no name, meaning if ran multiple times, it will create a new timer each timer.
 
+TriggerChronometer: Set a timer that is called if the function that checks for it is not called
+
 GetTimer: Get the remaining time of a timer by passing its name
 
 ClearTimer: Remove that timer (does not call the callback)
@@ -49,14 +51,14 @@ Code Example:
         {
             th = new TimerHandler();
     
-            // Call ILoveYou every 2 seconds, starting this very frame
+            // Call Heart every 2 seconds, starting this very frame
             th.AddTimer(new Timer()
             {
-                name = "Call ILoveYou immediately, than call it again every 2 seconds",
+                name = "Call Heart immediately, than call it again every 2 seconds",
                 time_left = 0,
                 duration = 2,
                 loopInfinitely = true,
-                Callback = () => { ILoveYou(); },
+                Callback = () => { Heart(); },
             });
         }
     
@@ -100,21 +102,32 @@ Code Example:
                     loops = 2, // Ran twice
                     loopInfinitely = false, // If true, will ignore the loops variable
                     runOnUnscaledTime = true, // Timer will still update every Update, but it will count real life time
-                    Callback = () => ILoveYou(), // Callback for when the function is done
+                    Callback = () => Heart(), // Callback for when the function is done
     
                     // Ran every frame the timer updates, passing the time remaining and the initial duration
-                    OnUpdate = (time_left, duration) => ILoveYouAtThisTime(time_left, duration),
+                    OnUpdate = (time_left, duration) => UpdateFunction(time_left, duration),
                 };
                 th.AddTimer(t);
             }
+
+            if (Input.GetKey(KeyCode.G))
+            {
+                // TriggerChronometer: Timer starts when you press G, resets if you let go. Timer only counts down while you're pressing G.
+                // It will only return true when you've been holding G for 1.5 seconds. After it returns true once, it will never return true again until you let go and start again.
+                if (th.TriggerChronometer("G Timer", 1.5f))
+                {
+                    Debug.Log("I have been pressing G for 1.5 seconds!");
+                }
+                
+            }
         }
     
-        void ILoveYouAtThisTime(float time_left, float duration)
+        void UpdateFunction(float time_left, float duration)
         {
             print($"We are {(1 - (time_left / duration)) * 100}% of the way there!");
         }
     
-        void ILoveYou()
+        void Heart()
         {
             print("<3");
         }
