@@ -21,6 +21,7 @@ To get started, add `NamedTimers` to namespaces. Then create a new timer handler
     
 There are 3 ways to create new timers, SetTimer, AddTimer, and AddNamelessTimer.
 There are also 3 other methods, GetTimer, ClearTimer, and ClearAll.
+There is also 1 method related to a thing called Chronometer.
 
 SetTimer: Creates a new named timer, and optionally takes a callback. If a timer with that name exists, this overrides it.
 
@@ -28,13 +29,13 @@ AddTimer: Creates a new named timer with more parameters. If a timer with that n
 
 AddNamelessTimer: Creates a new timer that has no name, meaning if ran multiple times, it will create a new timer each timer.
 
-TriggerChronometer: Set a timer that is called if the function that checks for it is not called
+TriggerChronometer: Set a timer that is called if the function that checks for it is called every Update tick.
 
-GetTimer: Get the remaining time of a timer by passing its name
+GetTimer: Get the remaining time of a timer by passing its name.
 
-ClearTimer: Remove that timer (does not call the callback)
+ClearTimer: Remove that timer. (does not call the callback)
 
-ClearAll: Clears all timers associated with this TimerHandler
+ClearAll: Clears all timers associated with this TimerHandler.
 
 Code Example:
 
