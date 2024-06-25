@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace NamedTimers
@@ -9,6 +8,7 @@ namespace NamedTimers
     {
         Dictionary<string, Timer> Timers = new();
         List<NamelessTimer> NamelessTimers = new();
+        Dictionary<string, Chronometer> Chronometers = new();
 
         class NamelessTimer
         {
@@ -16,10 +16,18 @@ namespace NamedTimers
             public float time_left;
         }
 
+        class Chronometer
+        {
+            public float value;
+            public bool isCalled;
+            public bool isFinished;
+        }
+
         public void Tick()
         {
             ManageTimers();
             ManageNamelessTimers();
+            ManageChronometers();
         }
 
         void AddTimerQuick(string name, float time, Action callback)
@@ -30,6 +38,7 @@ namespace NamedTimers
             t.time_left = time;
 
             t.Callback = callback;
+            t.preserve = true;
 
             Timers.Add(name, t);
         }
@@ -42,13 +51,18 @@ namespace NamedTimers
                 return;
             }
 
-            foreach(string s in Timers.Keys)
+            /*foreach(string s in Timers.Keys)
             {
                 if(t.name == s)
                 {
                     Timers.Remove(s);
                 }
-            }
+            }*/
+
+            Timers.Remove(t.name);
+
+            if (t.time_left == 0)
+                t.time_left = t.duration;
 
             Timers.Add(t.name, t);
         }
@@ -101,6 +115,31 @@ namespace NamedTimers
             Timers.Clear();
         }
 
+        public bool TriggerChronometer(string name, float target)
+        {
+            Chronometer c;
+
+            if (!Chronometers.TryGetValue(name, out c))
+            {
+                Chronometers[name] = new Chronometer();
+                c = Chronometers[name];
+            }
+
+            c.isCalled = true;
+
+            if (c.isFinished)
+                return false;
+
+            if (c.value > target)
+            {
+                c.value = 0;
+                c.isFinished = true;
+                return true;
+            }
+
+            return false;
+        }
+
         void ManageTimers()
         {
             List<string> keys_to_clear = new();
@@ -121,14 +160,19 @@ namespace NamedTimers
                     {
                         ActiveTimer -= Time.deltaTime;
                     }
+
+                    if (timer.OnUpdate != null)
+                    { 
+                        if(ActiveTimer < 0)
+                            timer.OnUpdate(0, timer.duration);
+                        else
+                            timer.OnUpdate(timer.time_left, timer.duration);
+                    }
                 }
-                
+
                 if (ActiveTimer < 0)
                 {
                     ActiveTimer = 0;
-
-                    if (timer.OnUpdate != null)
-                        timer.OnUpdate(timer.time_left, timer.duration);
 
                     if (timer.Callback != null)
                         timer.Callback();
@@ -140,7 +184,8 @@ namespace NamedTimers
                     }
                     else
                     {
-                        keys_to_clear.Add(key);
+                        if (!timer.preserve)
+                            keys_to_clear.Add(key);
                     }
                 }
             }
@@ -164,6 +209,23 @@ namespace NamedTimers
                     nt.callback();
                     NamelessTimers.RemoveAt(i);
                     i--;
+                }
+            }
+        }
+
+        void ManageChronometers()
+        {
+            foreach (var kvp in Chronometers)
+            {
+                if (kvp.Value.isCalled)
+                {
+                    kvp.Value.value += Time.deltaTime;
+                    kvp.Value.isCalled = false;
+                }
+                else
+                {
+                    kvp.Value.value = 0;
+                    kvp.Value.isFinished = false;
                 }
             }
         }
